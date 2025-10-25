@@ -13,9 +13,10 @@ void ClearMap()
         map[0][i] = '.';
     map[0][mapWidth] = '\0';
     for (int j = 1; j < mapHeight; j++) 
-        snprintf(map[j], map[0]);
-        // В будущем разобраться, почему VS Code предлагает использовать вот это:
-        // snprintf(map[j], sizeof(map[j]), "%s", map[0]);
+        // snprintf(map[j], map[0]); - не заработало, хотя в видео так показано
+        // Исправил на правильный вариант:
+        snprintf(map[j], sizeof(map[j]), "%s", map[0]);
+        // Объяснение: sizeof(map[j]) возвращает размер строки, что позволяет корректно скопировать содержимое map[0] в map[j].
 }
 
 void ShowMap()
@@ -27,6 +28,7 @@ void ShowMap()
 
 int main()
 {
-
+    ClearMap();
+    ShowMap();
     return 0;
 }
