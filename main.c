@@ -1,4 +1,4 @@
-// Теперь Марио умеет прыгать при нажатии пробела.
+// Создание CreateLevel и несколкьких кирпичей
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -17,7 +17,8 @@ typedef struct SObject {
 
 char map[mapHeight][mapWidth + 1];
 TObject mario;
-TObject brick[1];
+TObject *brick = NULL;
+int brickLength;
 
 void ClearMap() 
 {
@@ -54,6 +55,19 @@ void InitObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeigh
 }   
 
 BOOL IsCollision(TObject o1, TObject o2);
+
+void CreateLevel()
+{
+    InitObject(&mario, 39, 10, 3, 3);
+
+    brickLength = 5;
+    brick = malloc(sizeof(*brick) * brickLength);
+    InitObject(brick+0, 20, 20, 40, 5);
+    InitObject(brick+1, 60, 15, 10, 10);
+    InitObject(brick+2, 80, 20, 20, 5);
+    InitObject(brick+3, 100, 15, 10, 10);
+    InitObject(brick+4, 150, 20, 40, 5);
+}
 
 void VertMoveObject(TObject *obj) 
 {
@@ -107,8 +121,7 @@ BOOL IsCollision(TObject o1, TObject o2)
 
 int main()
 {
-    InitObject(&mario, 39, 10, 3, 3);
-    InitObject(brick, 20, 20, 40, 5);
+    CreateLevel();
 
     do {
         ClearMap();
@@ -117,7 +130,8 @@ int main()
         if(GetKeyState('A') < 0) HorizonMoveMap(1);
         if(GetKeyState('D') < 0) HorizonMoveMap(-1);
         VertMoveObject(&mario);
-        PutObjectOnMap(brick[0]);
+        for (int i = 0; i < brickLength; i++)
+            PutObjectOnMap(brick[i]);
         PutObjectOnMap(mario);
         SetCur(0, 0);
         ShowMap();
