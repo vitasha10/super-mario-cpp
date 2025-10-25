@@ -5,6 +5,10 @@
 #define mapWidth 80
 #define mapHeight 25
 
+typedef struct SObject {
+    float x, y;
+} TObject;
+
 char map[mapHeight][mapWidth + 1];
 
 void ClearMap() 
