@@ -86,6 +86,11 @@ void PutObjectOnMap(TObject obj)
                 map[j][i] = '@';
 }
 
+void HorizonMoveMap(float dx)
+{
+    brick[0].x += dx;
+}
+
 void SetCur(int x, int y)
 {
     COORD coord;
@@ -109,7 +114,8 @@ int main()
         ClearMap();
 
         if((mario.IsFly == FALSE) && (GetKeyState(VK_SPACE) < 0)) mario.vertSpeed = -1;
-        
+        if(GetKeyState('A') < 0) HorizonMoveMap(1);
+        if(GetKeyState('D') < 0) HorizonMoveMap(-1);
         VertMoveObject(&mario);
         PutObjectOnMap(brick[0]);
         PutObjectOnMap(mario);
