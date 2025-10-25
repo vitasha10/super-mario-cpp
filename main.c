@@ -1,4 +1,4 @@
-// Марио падает слишком быстро и программа ломается из-за выхода y за пределы допустимых значений.
+// Марио падает но больше не выходит за границы карты.
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -58,6 +58,11 @@ void VertMoveObject(TObject *obj)
     SetObjectPos(obj, (*obj).x, (*obj).y + (*obj).vertSpeed);
 }
 
+BOOL IsPosInMap(int x, int y)
+{
+    return ( (x >= 0) && (x < mapWidth) && (y >= 0) && (y < mapHeight) );
+}
+
 void PutObjectOnMap(TObject obj)
 {
     int ix = (int)round(obj.x); // для round нужно подключить math.h, предыдущий коммит.
@@ -67,7 +72,8 @@ void PutObjectOnMap(TObject obj)
 
     for (int i = ix; i < (ix + iWidth); i++)
         for (int j = iy; j < (iy + iHeight); j++)
-            map[j][i] = '@';
+            if (IsPosInMap(i, j))
+                map[j][i] = '@';
 }
 
 void SetCur(int x, int y)
