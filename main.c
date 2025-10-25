@@ -1,4 +1,4 @@
-// Добавил проверку коллизий между объектами и теперь Марио останавливается при столкновении с кирпичной платформой, в том числе при падении на неё.
+// Теперь Марио умеет прыгать при нажатии пробела.
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -104,6 +104,9 @@ int main()
 
     do {
         ClearMap();
+
+        if(GetKeyState(VK_SPACE) < 0) mario.vertSpeed = -0.7;
+        
         VertMoveObject(&mario);
         PutObjectOnMap(brick[0]);
         PutObjectOnMap(mario);
