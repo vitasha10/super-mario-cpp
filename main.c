@@ -1,4 +1,4 @@
-//Дописал за автором функцию ShowMap
+//Дописал за автором функцию SetObjectPos
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -30,6 +30,13 @@ void ShowMap()
     map[mapHeight - 1][mapWidth - 1] = '\0';
     for (int j = 0; j < mapHeight; j++) 
         printf("%s", map[j]);
+}
+
+void SetObjectPos(TObject *obj, float xPos, float yPos) 
+{
+    // Комментарий автора ролика: В данном случае мы меняем значение входной переменной obj, поэтому используем указатель.
+    (*obj).x = xPos;
+    (*obj).y = yPos;
 }
 
 int main()
