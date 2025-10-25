@@ -1,4 +1,4 @@
-// Марио падает но больше не выходит за границы карты.
+// Добавил блок, на который в будущем будет падать Марио.
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -16,7 +16,7 @@ typedef struct SObject {
 
 char map[mapHeight][mapWidth + 1];
 TObject mario;
-
+TObject brick[1];
 
 void ClearMap() 
 {
@@ -87,10 +87,12 @@ void SetCur(int x, int y)
 int main()
 {
     InitObject(&mario, 39, 10, 3, 3);
-    
+    InitObject(brick, 20, 20, 40, 5);
+
     do {
         ClearMap();
         VertMoveObject(&mario);
+        PutObjectOnMap(brick[0]);
         PutObjectOnMap(mario);
         SetCur(0, 0);
         ShowMap();
