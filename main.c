@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <math.h>
+
 #define mapWidth 80
 #define mapHeight 25
 
