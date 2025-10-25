@@ -77,6 +77,7 @@ int main()
     do {
         ClearMap();
         PutObjectOnMap(mario);
+        SetCur(0, 0);
         ShowMap();
     } while (GetKeyState(VK_ESCAPE) >= 0); // Пока не нажата клавиша ESCAPE, для этого нужен #include <windows.h>
     
