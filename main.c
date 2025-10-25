@@ -1,4 +1,4 @@
-//Дописал за автором функцию PutObjectOnMap
+// Сделать марио больше и переделать его позиционирование через функцию InitObject
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -9,6 +9,7 @@
 
 typedef struct SObject {
     float x, y;
+    float width, height;
 } TObject;
 
 char map[mapHeight][mapWidth + 1];
@@ -41,16 +42,29 @@ void SetObjectPos(TObject *obj, float xPos, float yPos)
     (*obj).y = yPos;
 }
 
+void InitObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeight) 
+{
+    SetObjectPos(obj, xPos, yPos);
+    (*obj).width = oWidth;
+    (*obj).height = oHeight;
+}   
+
 void PutObjectOnMap(TObject obj)
 {
     int ix = (int)round(obj.x); // для round нужно подключить math.h, предыдущий коммит.
     int iy = (int)round(obj.y);
-    map[iy][ix] = '@';
+    int iWidth = (int)round(obj.width);
+    int iHeight = (int)round(obj.height);
+
+    for (int i = ix; i < (ix + iWidth); i++)
+        for (int j = iy; j < (iy + iHeight); j++)
+            map[j][i] = '@';
 }
 
 int main()
 {
-    SetObjectPos(&mario, 20, 10);
+    InitObject(&mario, 39, 10, 3, 3);
+    //SetObjectPos(&mario, 20, 10);
     ClearMap();
     PutObjectOnMap(mario);
     ShowMap();
