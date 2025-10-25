@@ -1,4 +1,4 @@
-// Создание CreateLevel и несколкьких кирпичей
+// Теперь все кирпичи двигаются вместе с картой
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -61,8 +61,8 @@ void CreateLevel()
     InitObject(&mario, 39, 10, 3, 3);
 
     brickLength = 5;
-    brick = malloc(sizeof(*brick) * brickLength);
-    InitObject(brick+0, 20, 20, 40, 5);
+    brick = malloc(sizeof(*brick) * brickLength); // не заработало на C++, так как для C++ нужно использовать new, вот вся строка: brick = new TObject[brickLength];
+    InitObject(brick+0, 20, 20, 40, 5); 
     InitObject(brick+1, 60, 15, 10, 10);
     InitObject(brick+2, 80, 20, 20, 5);
     InitObject(brick+3, 100, 15, 10, 10);
@@ -102,7 +102,8 @@ void PutObjectOnMap(TObject obj)
 
 void HorizonMoveMap(float dx)
 {
-    brick[0].x += dx;
+    for (int i = 0; i < brickLength; i++)
+        brick[i].x += dx;
 }
 
 void SetCur(int x, int y)
