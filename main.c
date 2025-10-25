@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include <math.h>
+#include <windows.h>
 
 #define mapWidth 80
 #define mapHeight 25
@@ -64,9 +65,12 @@ void PutObjectOnMap(TObject obj)
 int main()
 {
     InitObject(&mario, 39, 10, 3, 3);
-    //SetObjectPos(&mario, 20, 10);
-    ClearMap();
-    PutObjectOnMap(mario);
-    ShowMap();
+    
+    do {
+        ClearMap();
+        PutObjectOnMap(mario);
+        ShowMap();
+    } while (GetKeyState(VK_ESCAPE) >= 0); // Пока не нажата клавиша ESCAPE, для этого нужен #include <windows.h>
+    
     return 0;
 }
