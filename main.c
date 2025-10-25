@@ -61,7 +61,7 @@ void CreateLevel()
     InitObject(&mario, 39, 10, 3, 3);
 
     brickLength = 5;
-    brick = malloc(sizeof(*brick) * brickLength); // не заработало на C++, так как для C++ нужно использовать new, вот вся строка: brick = new TObject[brickLength];
+    brick = realloc(brick, sizeof(*brick) * brickLength); // не заработало на C++, так как для C++ нужно использовать new, вот вся строка: brick = new TObject[brickLength];
     InitObject(brick+0, 20, 20, 40, 5); 
     InitObject(brick+1, 60, 15, 10, 10);
     InitObject(brick+2, 80, 20, 20, 5);
@@ -106,6 +106,14 @@ void PutObjectOnMap(TObject obj)
 
 void HorizonMoveMap(float dx)
 {
+    mario.x -= dx;
+    for (int i = 0; i < brickLength; i++)
+        if(IsCollision(mario, brick[i]))
+        {
+            mario.x += dx;
+            return;
+        }
+    mario.x += dx;
     for (int i = 0; i < brickLength; i++)
         brick[i].x += dx;
 }
@@ -134,6 +142,9 @@ int main()
         if((mario.IsFly == FALSE) && (GetKeyState(VK_SPACE) < 0)) mario.vertSpeed = -1;
         if(GetKeyState('A') < 0) HorizonMoveMap(1);
         if(GetKeyState('D') < 0) HorizonMoveMap(-1);
+
+        if(mario.y > mapHeight) CreateLevel();
+
         VertMoveObject(&mario);
         for (int i = 0; i < brickLength; i++)
             PutObjectOnMap(brick[i]);
