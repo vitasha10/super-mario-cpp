@@ -1,4 +1,4 @@
-// Сделать анимацию движения персонажа Mario по карте в консоли, избавить Марио от "мерцания" при движении.
+// Марио падает слишком быстро и программа ломается из-за выхода y за пределы допустимых значений.
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -11,6 +11,7 @@
 typedef struct SObject {
     float x, y;
     float width, height;
+    float vertSpeed;
 } TObject;
 
 char map[mapHeight][mapWidth + 1];
@@ -48,7 +49,14 @@ void InitObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeigh
     SetObjectPos(obj, xPos, yPos);
     (*obj).width = oWidth;
     (*obj).height = oHeight;
+    (*obj).vertSpeed = 0;
 }   
+
+void VertMoveObject(TObject *obj) 
+{
+    (*obj).vertSpeed += 0.05;
+    SetObjectPos(obj, (*obj).x, (*obj).y + (*obj).vertSpeed);
+}
 
 void PutObjectOnMap(TObject obj)
 {
@@ -76,9 +84,11 @@ int main()
     
     do {
         ClearMap();
+        VertMoveObject(&mario);
         PutObjectOnMap(mario);
         SetCur(0, 0);
         ShowMap();
+        Sleep(10);
     } while (GetKeyState(VK_ESCAPE) >= 0); // Пока не нажата клавиша ESCAPE, для этого нужен #include <windows.h>
     
     return 0;
