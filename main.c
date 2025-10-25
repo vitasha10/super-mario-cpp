@@ -1,4 +1,4 @@
-//Дописал за автором функцию SetObjectPos
+//Дописал за автором функцию PutObjectOnMap
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -39,6 +39,13 @@ void SetObjectPos(TObject *obj, float xPos, float yPos)
     // Комментарий автора ролика: В данном случае мы меняем значение входной переменной obj, поэтому используем указатель.
     (*obj).x = xPos;
     (*obj).y = yPos;
+}
+
+void PutObjectOnMap(TObject obj)
+{
+    int ix = (int)round(obj.x); // для round нужно подключить math.h, предыдущий коммит.
+    int iy = (int)round(obj.y);
+    map[iy][ix] = '@';
 }
 
 int main()
