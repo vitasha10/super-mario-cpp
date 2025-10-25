@@ -1,4 +1,4 @@
-//Дописал за автором функцию ClearMap
+//Дописал за автором функцию ShowMap
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -7,7 +7,8 @@
 
 char map[mapHeight][mapWidth + 1];
 
-void ClearMap() {
+void ClearMap() 
+{
     for (int i = 0; i < mapWidth; i++) 
         map[0][i] = '.';
     map[0][mapWidth] = '\0';
@@ -17,7 +18,15 @@ void ClearMap() {
         // snprintf(map[j], sizeof(map[j]), "%s", map[0]);
 }
 
-int main() {
+void ShowMap()
+{
+    map[mapHeight - 1][mapWidth - 1] = '\0';
+    for (int j = 0; j < mapHeight; j++) 
+        printf("%s", map[j]);
+}
+
+int main()
+{
 
     return 0;
 }
