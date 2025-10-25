@@ -74,11 +74,15 @@ void VertMoveObject(TObject *obj)
     (*obj).IsFly = TRUE;
     (*obj).vertSpeed += 0.05;
     SetObjectPos(obj, (*obj).x, (*obj).y + (*obj).vertSpeed);
-    if(IsCollision(*obj, brick[0]))
+    for (int i = 0; i < brickLength; i++)
     {
-        (*obj).y -= (*obj).vertSpeed;
-        (*obj).vertSpeed = 0;
-        (*obj).IsFly = FALSE;
+        if(IsCollision(*obj, brick[i]))
+        {
+            (*obj).y -= (*obj).vertSpeed;
+            (*obj).vertSpeed = 0;
+            (*obj).IsFly = FALSE;
+            break;
+        }
     }
 }
 
