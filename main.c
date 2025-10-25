@@ -1,4 +1,4 @@
-// Сделать марио больше и переделать его позиционирование через функцию InitObject
+// Сделать анимацию движения персонажа Mario по карте в консоли, избавить Марио от "мерцания" при движении.
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -60,6 +60,14 @@ void PutObjectOnMap(TObject obj)
     for (int i = ix; i < (ix + iWidth); i++)
         for (int j = iy; j < (iy + iHeight); j++)
             map[j][i] = '@';
+}
+
+void SetCur(int x, int y)
+{
+    COORD coord;
+    coord.X = x;
+    coord.Y = y;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
 int main()
