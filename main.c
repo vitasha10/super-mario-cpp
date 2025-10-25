@@ -50,7 +50,9 @@ void PutObjectOnMap(TObject obj)
 
 int main()
 {
+    SetObjectPos(&mario, 20, 10);
     ClearMap();
+    PutObjectOnMap(mario);
     ShowMap();
     return 0;
 }
