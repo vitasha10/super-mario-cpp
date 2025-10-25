@@ -10,6 +10,8 @@ typedef struct SObject {
 } TObject;
 
 char map[mapHeight][mapWidth + 1];
+TObject mario;
+
 
 void ClearMap() 
 {
