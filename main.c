@@ -144,6 +144,12 @@ void VertMoveObject(TObject *obj)
             if(obj[0].vertSpeed > 0)
                 obj[0].IsFly = FALSE;
 
+            if((brick[i].cType == '?') && (obj[0].vertSpeed < 0) && (obj == &mario))
+            {
+                brick[i].cType = '-';
+                InitObject(GetNewMoving(), brick[i].x, brick[i].y - 3, 3, 2, '$');
+            }
+
             (*obj).y -= (*obj).vertSpeed;
             (*obj).vertSpeed = 0;
             
@@ -192,21 +198,22 @@ void HorizonMoveObject(TObject *obj)
     obj[0].x += obj[0].horizSpeed;
 
     for(int i = 0; i < brickLength; i++)
-    {
         if(IsCollision(obj[0], brick[i]))
         {
             obj[0].x -= obj[0].horizSpeed;
             obj[0].horizSpeed = -obj[0].horizSpeed;
             return;
         }
-    }
     
-    TObject tmp = *obj;
-    VertMoveObject(&tmp);
-    if(tmp.IsFly == TRUE)
+    if(obj[0].cType == 'o')
     {
-        obj[0].x -= obj[0].horizSpeed;
-        obj[0].horizSpeed = -obj[0].horizSpeed;
+        TObject tmp = *obj;
+        VertMoveObject(&tmp);
+        if(tmp.IsFly == TRUE)
+        {
+            obj[0].x -= obj[0].horizSpeed;
+            obj[0].horizSpeed = -obj[0].horizSpeed;
+        }
     }
 }
 
