@@ -90,7 +90,7 @@ void CreateLevel(int lvl)
     {
         brickLength = 0;
         InitObject(GetNewBrick(), 20, 20, 40, 5, '#'); 
-        InitObject(GetNewBrick(), 60, 15, 10, 10, '#');
+        InitObject(GetNewBrick(), 60, 15, 40, 10, '#');
         InitObject(GetNewBrick(), 100, 20, 20, 5, '#');
         InitObject(GetNewBrick(), 120, 15, 10, 10, '#');
         InitObject(GetNewBrick(), 150, 20, 40, 5, '#');
