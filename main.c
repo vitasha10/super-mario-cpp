@@ -20,6 +20,8 @@ char map[mapHeight][mapWidth + 1];
 TObject mario;
 TObject *brick = NULL;
 int brickLength;
+int level = 1;
+
 
 void ClearMap() 
 {
@@ -57,20 +59,32 @@ void InitObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeigh
 }   
 
 BOOL IsCollision(TObject o1, TObject o2);
-void CreateLevel();
+void CreateLevel(int lvl);
 
-void CreateLevel()
+void CreateLevel(int lvl)
 {
     InitObject(&mario, 39, 10, 3, 3, '@');
 
-    brickLength = 6;
-    brick = realloc(brick, sizeof(*brick) * brickLength); // не заработало на C++, так как для C++ нужно использовать new, вот вся строка: brick = new TObject[brickLength];
-    InitObject(brick+0, 20, 20, 40, 5, '#'); 
-    InitObject(brick+1, 60, 15, 10, 10, '#');
-    InitObject(brick+2, 80, 20, 20, 5, '#');
-    InitObject(brick+3, 100, 15, 10, 10, '#');
-    InitObject(brick+4, 150, 20, 40, 5, '#');
-    InitObject(brick+5, 210, 15, 10, 1, '+');
+    if(lvl == 1)
+    {
+        brickLength = 6;
+        brick = realloc(brick, sizeof(*brick) * brickLength); // не заработало на C++, так как для C++ нужно использовать new, вот вся строка: brick = new TObject[brickLength];
+        InitObject(brick+0, 20, 20, 40, 5, '#'); 
+        InitObject(brick+1, 60, 15, 10, 10, '#');
+        InitObject(brick+2, 80, 20, 20, 5, '#');
+        InitObject(brick+3, 100, 15, 10, 10, '#');
+        InitObject(brick+4, 150, 20, 40, 5, '#');
+        InitObject(brick+5, 210, 15, 10, 1, '+');
+    }
+    if (lvl == 2)
+    {
+        brickLength = 4;
+        brick = realloc(brick, sizeof(*brick) * brickLength);
+        InitObject(brick+0, 20, 20, 40, 5, '#'); 
+        InitObject(brick+1, 80, 20, 15, 5, '#');
+        InitObject(brick+2, 120, 15, 15, 10, '#');
+        InitObject(brick+3, 160, 10, 15, 15, '+');
+    }
 }
 
 void VertMoveObject(TObject *obj) 
@@ -87,7 +101,9 @@ void VertMoveObject(TObject *obj)
             (*obj).IsFly = FALSE;
             if(brick[i].cType == '+')
             {
-                CreateLevel();
+                level++;
+                if(level > 2) level = 1;
+                CreateLevel(level);
                 Sleep(1000);    
             }
             break;
@@ -143,7 +159,7 @@ BOOL IsCollision(TObject o1, TObject o2)
 
 int main()
 {
-    CreateLevel();
+    CreateLevel(level);
 
     do {
         ClearMap();
@@ -152,7 +168,7 @@ int main()
         if(GetKeyState('A') < 0) HorizonMoveMap(1);
         if(GetKeyState('D') < 0) HorizonMoveMap(-1);
 
-        if(mario.y > mapHeight) CreateLevel();
+        if(mario.y > mapHeight) CreateLevel(level);
 
         VertMoveObject(&mario);
         for (int i = 0; i < brickLength; i++)
