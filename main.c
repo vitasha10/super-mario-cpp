@@ -28,6 +28,8 @@ int movingLength;
 
 int level = 1;
 
+BOOL IsCollision(TObject o1, TObject o2);
+void CreateLevel(int lvl);
 
 void ClearMap() 
 {
@@ -63,10 +65,14 @@ void InitObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeigh
     (*obj).vertSpeed = 0;
     (*obj).cType = inType;
     (*obj).horizSpeed = 0.2;
-}   
+} 
 
-BOOL IsCollision(TObject o1, TObject o2);
-void CreateLevel(int lvl);
+void PlayerDead()
+{
+    system("color 4F");
+    Sleep(500);
+    CreateLevel(level);
+}
 
 TObject *GetNewBrick()
 {
@@ -202,7 +208,7 @@ void MarioCollision()
                     continue;
                 } 
                 else 
-                    CreateLevel(level);
+                    PlayerDead();
             }
             if(moving[i].cType == '$')
             {
@@ -297,7 +303,7 @@ int main()
         if(GetKeyState('A') < 0) HorizonMoveMap(1);
         if(GetKeyState('D') < 0) HorizonMoveMap(-1);
 
-        if(mario.y > mapHeight) CreateLevel(level);
+        if(mario.y > mapHeight) PlayerDead();
 
         VertMoveObject(&mario);
         MarioCollision();
