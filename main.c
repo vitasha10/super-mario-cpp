@@ -72,7 +72,7 @@ void CreateLevel(int lvl)
         InitObject(brick+0, 20, 20, 40, 5, '#'); 
         InitObject(brick+1, 60, 15, 10, 10, '#');
         InitObject(brick+2, 80, 20, 20, 5, '#');
-        InitObject(brick+3, 100, 15, 10, 10, '#');
+        InitObject(brick+3, 120, 15, 10, 10, '#');
         InitObject(brick+4, 150, 20, 40, 5, '#');
         InitObject(brick+5, 210, 15, 10, 1, '+');
     }
@@ -160,7 +160,7 @@ BOOL IsCollision(TObject o1, TObject o2)
 int main()
 {
     CreateLevel(level);
-
+    system("color 9F");
     do {
         ClearMap();
 
