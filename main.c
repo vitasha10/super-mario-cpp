@@ -28,6 +28,7 @@ int movingLength;
 
 int level = 1;
 int score;
+int maxLvl;
 
 BOOL IsCollision(TObject o1, TObject o2);
 void CreateLevel(int lvl);
@@ -160,6 +161,7 @@ void CreateLevel(int lvl)
         InitObject(GetNewMoving(), 120, 10, 3, 2, 'o');
         InitObject(GetNewMoving(), 130, 10, 3, 2, 'o');
     }
+    maxLvl = 3;
 }
 
 void VertMoveObject(TObject *obj) 
@@ -187,7 +189,7 @@ void VertMoveObject(TObject *obj)
             if(brick[i].cType == '+')
             {
                 level++;
-                if(level > 3) level = 1;
+                if(level > maxLvl) level = 1;
                 system("color 2F");
                 Sleep(500);  
                 CreateLevel(level);  
@@ -217,6 +219,7 @@ void MarioCollision()
                     && (mario.y + mario.height < moving[i].y + moving[i].height * 0.5)
                     ) 
                 {
+                    score += 50;
                     DeleteMoving(i); 
                     i--;
                     continue;
@@ -226,6 +229,7 @@ void MarioCollision()
             }
             if(moving[i].cType == '$')
             {
+                score += 100;
                 DeleteMoving(i); 
                 i--;
                 continue;
