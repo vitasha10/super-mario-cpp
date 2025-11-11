@@ -90,6 +90,8 @@ void CreateLevel(int lvl)
     {
         brickLength = 0;
         InitObject(GetNewBrick(), 20, 20, 40, 5, '#'); 
+            InitObject(GetNewBrick(), 30, 10, 5, 3, '?');
+            InitObject(GetNewBrick(), 50, 10, 5, 3, '?');
         InitObject(GetNewBrick(), 60, 15, 40, 10, '#');
         InitObject(GetNewBrick(), 100, 20, 20, 5, '#');
         InitObject(GetNewBrick(), 120, 15, 10, 10, '#');
@@ -139,9 +141,12 @@ void VertMoveObject(TObject *obj)
     {
         if(IsCollision(*obj, brick[i]))
         {
+            if(obj[0].vertSpeed > 0)
+                obj[0].IsFly = FALSE;
+
             (*obj).y -= (*obj).vertSpeed;
             (*obj).vertSpeed = 0;
-            (*obj).IsFly = FALSE;
+            
             if(brick[i].cType == '+')
             {
                 level++;
