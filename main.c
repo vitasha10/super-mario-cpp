@@ -84,6 +84,7 @@ TObject *GetNewMoving()
 
 void CreateLevel(int lvl)
 {
+    system("color 9F");
     brickLength = 0;
     brick = realloc(brick, 0);
     movingLength = 0;
@@ -106,7 +107,7 @@ void CreateLevel(int lvl)
         InitObject(GetNewBrick(), 120, 15, 10, 10, '#');
         InitObject(GetNewBrick(), 150, 20, 40, 5, '#');
         InitObject(GetNewBrick(), 210, 15, 10, 1, '+');
-        
+
         InitObject(GetNewMoving(), 25, 10, 3, 2, 'o');
         InitObject(GetNewMoving(), 80, 10, 3, 2, 'o');
     }
@@ -167,8 +168,9 @@ void VertMoveObject(TObject *obj)
             {
                 level++;
                 if(level > 3) level = 1;
-                CreateLevel(level);
-                Sleep(1000);    
+                system("color 2F");
+                Sleep(500);  
+                CreateLevel(level);  
             }
             break;
         }
@@ -287,7 +289,7 @@ BOOL IsCollision(TObject o1, TObject o2)
 int main()
 {
     CreateLevel(level);
-    system("color 9F");
+
     do {
         ClearMap();
 
