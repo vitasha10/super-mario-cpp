@@ -75,6 +75,13 @@ TObject *GetNewBrick()
     return brick + brickLength - 1;
 }
 
+TObject *GetNewMoving()
+{
+    movingLength++;
+    moving = realloc(moving, sizeof(*moving) * movingLength);
+    return moving + movingLength - 1;
+}
+
 void CreateLevel(int lvl)
 {
     InitObject(&mario, 39, 10, 3, 3, '@');
@@ -82,25 +89,44 @@ void CreateLevel(int lvl)
     if(lvl == 1)
     {
         brickLength = 0;
-        brick = realloc(brick, sizeof(*brick) * brickLength); // не заработало на C++, так как для C++ нужно использовать new, вот вся строка: brick = new TObject[brickLength];
+        InitObject(GetNewBrick(), 20, 20, 40, 5, '#'); 
+        InitObject(GetNewBrick(), 60, 15, 10, 10, '#');
+        InitObject(GetNewBrick(), 100, 20, 20, 5, '#');
+        InitObject(GetNewBrick(), 120, 15, 10, 10, '#');
+        InitObject(GetNewBrick(), 150, 20, 40, 5, '#');
+        InitObject(GetNewBrick(), 210, 15, 10, 1, '+');
+    }
+    if(lvl == 2)
+    {
+        brickLength = 0;
         InitObject(GetNewBrick(), 20, 20, 40, 5, '#'); 
         InitObject(GetNewBrick(), 60, 15, 10, 10, '#');
         InitObject(GetNewBrick(), 80, 20, 20, 5, '#');
         InitObject(GetNewBrick(), 120, 15, 10, 10, '#');
         InitObject(GetNewBrick(), 150, 20, 40, 5, '#');
         InitObject(GetNewBrick(), 210, 15, 10, 1, '+');
-        movingLength = 1;
-        moving = realloc(moving, sizeof(*moving) * movingLength);
-        InitObject(moving+0, 25, 10, 3, 2, 'o');
+        movingLength = 0;
+        InitObject(GetNewMoving(), 25, 10, 3, 2, 'o');
+        InitObject(GetNewMoving(), 80, 10, 3, 2, 'o');
+        InitObject(GetNewMoving(), 65, 10, 3, 2, 'o');
+        InitObject(GetNewMoving(), 120, 10, 3, 2, 'o');
+        InitObject(GetNewMoving(), 160, 10, 3, 2, 'o');
+        InitObject(GetNewMoving(), 175, 10, 3, 2, 'o');
     }
-    if (lvl == 2)
+    if (lvl == 3)
     {
         brickLength = 0;
-        brick = realloc(brick, sizeof(*brick) * brickLength);
         InitObject(GetNewBrick(), 20, 20, 40, 5, '#'); 
         InitObject(GetNewBrick(), 80, 20, 15, 5, '#');
         InitObject(GetNewBrick(), 120, 15, 15, 10, '#');
         InitObject(GetNewBrick(), 160, 10, 15, 15, '+');
+        movingLength = 0;
+        InitObject(GetNewMoving(), 25, 10, 3, 2, 'o');
+        InitObject(GetNewMoving(), 50, 10, 3, 2, 'o');
+        InitObject(GetNewMoving(), 80, 10, 3, 2, 'o');
+        InitObject(GetNewMoving(), 90, 10, 3, 2, 'o');
+        InitObject(GetNewMoving(), 120, 10, 3, 2, 'o');
+        InitObject(GetNewMoving(), 130, 10, 3, 2, 'o');
     }
 }
 
@@ -119,7 +145,7 @@ void VertMoveObject(TObject *obj)
             if(brick[i].cType == '+')
             {
                 level++;
-                if(level > 2) level = 1;
+                if(level > 3) level = 1;
                 CreateLevel(level);
                 Sleep(1000);    
             }
