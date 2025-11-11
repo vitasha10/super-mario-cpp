@@ -27,6 +27,7 @@ TObject *moving = NULL;
 int movingLength;
 
 int level = 1;
+int score;
 
 BOOL IsCollision(TObject o1, TObject o2);
 void CreateLevel(int lvl);
@@ -88,6 +89,17 @@ TObject *GetNewMoving()
     return moving + movingLength - 1;
 }
 
+void PutScoreOnMap()
+{
+    char c[30];
+    snprintf(c, sizeof(c), "Score: %d", score);
+    int len = strlen(c);
+    for(int i = 0; i < len; i++)
+    {
+        map[1][i+5] = c[i];
+    }
+}
+
 void CreateLevel(int lvl)
 {
     system("color 9F");
@@ -97,6 +109,7 @@ void CreateLevel(int lvl)
     moving = realloc(moving, 0);
 
     InitObject(&mario, 39, 10, 3, 3, '@');
+    score = 0; 
 
     if(lvl == 1)
     {
@@ -324,6 +337,7 @@ int main()
             PutObjectOnMap(moving[i]);
         }
         PutObjectOnMap(mario);
+        PutScoreOnMap();
         SetCur(0, 0);
         ShowMap();
         Sleep(10);
