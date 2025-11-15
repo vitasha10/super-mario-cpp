@@ -1,8 +1,8 @@
 // Теперь уровень можно пройти
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <math.h>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <windows.h>
 
 #define mapWidth 80
@@ -30,8 +30,24 @@ int level = 1;
 int score;
 int maxLvl;
 
-BOOL IsCollision(TObject o1, TObject o2);
+void ClearMap();
+void ShowMap();
+void SetObjectPos(TObject *obj, float xPos, float yPos);
+void InitObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeight, char inType);
+void PlayerDead();
+TObject *GetNewBrick();
+TObject *GetNewMoving();
+void PutScoreOnMap();
 void CreateLevel(int lvl);
+void VertMoveObject(TObject *obj);
+void DeleteMoving(int i);
+void MarioCollision();
+void HorizonMoveObject(TObject *obj);
+BOOL IsPosInMap(int x, int y);
+void PutObjectOnMap(TObject obj);
+void HorizonMoveMap(float dx);
+void SetCur(int x, int y);
+BOOL IsCollision(TObject o1, TObject o2);
 
 void ClearMap()
 {
