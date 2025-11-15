@@ -75,7 +75,7 @@ void ClearMap()
 
 void ShowMap()
 {
-    map[mapHeight - 1][mapWidth - 1] = '\0';
+    map[mapHeight - 1][mapWidth] = '\0';
     for (int j = 0; j < mapHeight; j++)
         printf("%s", map[j]);
 }
