@@ -68,6 +68,9 @@ void place_object_on_map(const TObject obj);
 void scroll_map_horizontal(float dx);
 void set_cursor_pos(int x, int y);
 bool check_collision(const TObject o1, const TObject o2);
+bool is_stomp_kill(const TObject& player, const TObject& enemy);
+bool is_coin_pickup(const TObject& obj);
+void add_score_and_remove_mob(int points, int& index);
 void handle_input();
 void update_world();
 void render_frame();
@@ -257,35 +260,46 @@ void remove_mob_by_index(int i)
     mobs = realloc(mobs, sizeof(*mobs) * mobs_count);
 }
 
+bool is_stomp_kill(const TObject& player, const TObject& enemy)
+{
+    return (player.is_flying == true) &&
+           (player.vy > 0) &&
+           (player.y + player.height < enemy.y + enemy.height * 0.5);
+}
+
+bool is_coin_pickup(const TObject& obj)
+{
+    return obj.glyph == CHAR_COIN;
+}
+
+void add_score_and_remove_mob(int points, int& index)
+{
+    score += points;
+    remove_mob_by_index(index);
+    index--;
+}
+
 void handle_mario_collisions()
 {
     for (int i = 0; i < mobs_count; i++)
     {
-        if (check_collision(mario, mobs[i]))
+        if (!check_collision(mario, mobs[i]))
+            continue;
+
+        if (mobs[i].glyph == CHAR_ENEMY)
         {
-            if (mobs[i].glyph == CHAR_ENEMY)
+            if (is_stomp_kill(mario, mobs[i]))
             {
-                if ((mario.is_flying == true) &&
-                    (mario.vy > 0) &&
-                    (mario.y + mario.height < mobs[i].y + mobs[i].height * 0.5))
-                {
-                    score += POINTS_FOR_ENEMY;
-                    remove_mob_by_index(i);
-                    i--;
-                    continue;
-                }
-                else
-                {
-                    handle_player_death();
-                }
-            }
-            if (mobs[i].glyph == CHAR_COIN)
-            {
-                score += POINTS_FOR_COIN;
-                remove_mob_by_index(i);
-                i--;
+                add_score_and_remove_mob(POINTS_FOR_ENEMY, i);
                 continue;
             }
+            handle_player_death();
+            return;
+        }
+
+        if (is_coin_pickup(mobs[i]))
+        {
+            add_score_and_remove_mob(POINTS_FOR_COIN, i);
         }
     }
 }
