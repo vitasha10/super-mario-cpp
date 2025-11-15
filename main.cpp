@@ -27,7 +27,7 @@ typedef struct SObject {
     float x, y;
     float width, height;
     float vertSpeed;
-    BOOL IsFly;
+    bool IsFly;
     char cType;
     float horizSpeed;
 } TObject;
@@ -58,11 +58,11 @@ void VertMoveObject(TObject *obj);
 void DeleteMoving(int i);
 void MarioCollision();
 void HorizonMoveObject(TObject *obj);
-BOOL IsPosInMap(int x, int y);
-void PutObjectOnMap(TObject obj);
+bool IsPosInMap(int x, int y);
+void PutObjectOnMap(const TObject obj);
 void HorizonMoveMap(float dx);
 void SetCur(int x, int y);
-BOOL IsCollision(TObject o1, TObject o2);
+bool IsCollision(const TObject o1, const TObject o2);
 
 void ClearMap()
 {
@@ -193,7 +193,7 @@ void CreateLevel(int lvl)
 
 void VertMoveObject(TObject *obj)
 {
-    (*obj).IsFly = TRUE;
+    (*obj).IsFly = true;
     (*obj).vertSpeed += GRAVITY;
     SetObjectPos(obj, (*obj).x, (*obj).y + (*obj).vertSpeed);
     for (int i = 0; i < brickLength; i++)
@@ -201,7 +201,7 @@ void VertMoveObject(TObject *obj)
         if (IsCollision(*obj, brick[i]))
         {
             if (obj[0].vertSpeed > 0)
-                obj[0].IsFly = FALSE;
+                obj[0].IsFly = false;
 
             if ((brick[i].cType == CHAR_QUESTION_BLOCK) && (obj[0].vertSpeed < 0) && (obj == &mario))
             {
@@ -242,7 +242,7 @@ void MarioCollision()
         {
             if (moving[i].cType == CHAR_ENEMY)
             {
-                if ((mario.IsFly == TRUE) &&
+                if ((mario.IsFly == true) &&
                     (mario.vertSpeed > 0) &&
                     (mario.y + mario.height < moving[i].y + moving[i].height * 0.5))
                 {
@@ -285,7 +285,7 @@ void HorizonMoveObject(TObject *obj)
     {
         TObject tmp = *obj;
         VertMoveObject(&tmp);
-        if (tmp.IsFly == TRUE)
+        if (tmp.IsFly == true)
         {
             obj[0].x -= obj[0].horizSpeed;
             obj[0].horizSpeed = -obj[0].horizSpeed;
@@ -293,12 +293,12 @@ void HorizonMoveObject(TObject *obj)
     }
 }
 
-BOOL IsPosInMap(int x, int y)
+bool IsPosInMap(int x, int y)
 {
     return (x >= 0) && (x < mapWidth) && (y >= 0) && (y < mapHeight);
 }
 
-void PutObjectOnMap(TObject obj)
+void PutObjectOnMap(const TObject obj)
 {
     int ix = (int)round(obj.x);
     int iy = (int)round(obj.y);
@@ -337,7 +337,7 @@ void SetCur(int x, int y)
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
-BOOL IsCollision(TObject o1, TObject o2)
+bool IsCollision(const TObject o1, const TObject o2)
 {
     return ((o1.x + o1.width) > o2.x) && (o1.x < (o2.x + o2.width)) &&
            ((o1.y + o1.height) > o2.y) && (o1.y < (o2.y + o2.height));
@@ -351,7 +351,7 @@ int main()
     {
         ClearMap();
 
-        if ((mario.IsFly == FALSE) && (GetKeyState(VK_SPACE) < 0))
+        if ((mario.IsFly == false) && (GetKeyState(VK_SPACE) < 0))
             mario.vertSpeed = JUMP_IMPULSE;
         if (GetKeyState('A') < 0)
             HorizonMoveMap(1);
