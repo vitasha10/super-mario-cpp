@@ -133,24 +133,25 @@ void handle_player_death()
 TObject *add_brick()
 {
     bricks_count++;
-    bricks = realloc(bricks, sizeof(*bricks) * bricks_count);
+    bricks = static_cast<TObject*>(std::realloc(bricks, sizeof(*bricks) * bricks_count));
     return bricks + bricks_count - 1;
 }
 
 TObject *add_mob()
 {
     mobs_count++;
-    mobs = realloc(mobs, sizeof(*mobs) * mobs_count);
+    mobs = static_cast<TObject*>(std::realloc(mobs, sizeof(*mobs) * mobs_count));
     return mobs + mobs_count - 1;
 }
 
 void draw_score_on_map()
 {
     std::string score_text = "Score: " + std::to_string(score);
-    int len = score_text.length();
+    int len = static_cast<int>(score_text.length());
     for (int i = 0; i < len; i++)
     {
-        screen_buffer[1][i + 5] = score_text[i];
+        if (i + 5 < MAP_WIDTH)
+            screen_buffer[1][i + 5] = score_text[i];
     }
 }
 
@@ -158,9 +159,9 @@ void load_level(int lvl)
 {
     set_console_color(0x9F);
     bricks_count = 0;
-    bricks = realloc(bricks, 0);
+    bricks = static_cast<TObject*>(std::realloc(bricks, 0));
     mobs_count = 0;
-    mobs = realloc(mobs, 0);
+    mobs = static_cast<TObject*>(std::realloc(mobs, 0));
 
     init_object(&mario, 39, 10, 3, 3, CHAR_MARIO);
     score = 0;
@@ -233,7 +234,7 @@ void move_object_vertical(TObject *obj)
             {
                 bricks[i].glyph = CHAR_USED_BLOCK;
                 init_object(add_mob(), bricks[i].x, bricks[i].y - 3, 3, 2, CHAR_COIN);
-                mobs[mobs_count - 1].vy = -0.7;
+                mobs[mobs_count - 1].vy = -0.7f;
             }
 
             obj->y -= obj->vy;
@@ -258,14 +259,14 @@ void remove_mob_by_index(int i)
 {
     mobs_count--;
     mobs[i] = mobs[mobs_count];
-    mobs = realloc(mobs, sizeof(*mobs) * mobs_count);
+    mobs = static_cast<TObject*>(std::realloc(mobs, sizeof(*mobs) * mobs_count));
 }
 
 bool is_stomp_kill(const TObject& player, const TObject& enemy)
 {
     return (player.is_flying == true) &&
            (player.vy > 0) &&
-           (player.y + player.height < enemy.y + enemy.height * 0.5);
+           (player.y + player.height < enemy.y + enemy.height * 0.5f);
 }
 
 bool is_coin_pickup(const TObject& obj)
@@ -338,10 +339,10 @@ bool is_within_map(int x, int y)
 
 void place_object_on_map(const TObject obj)
 {
-    int ix = (int)round(obj.x);
-    int iy = (int)round(obj.y);
-    int iWidth = (int)round(obj.width);
-    int iHeight = (int)round(obj.height);
+    int ix = static_cast<int>(std::round(obj.x));
+    int iy = static_cast<int>(std::round(obj.y));
+    int iWidth = static_cast<int>(std::round(obj.width));
+    int iHeight = static_cast<int>(std::round(obj.height));
 
     for (int i = ix; i < (ix + iWidth); i++)
         for (int j = iy; j < (iy + iHeight); j++)
@@ -370,8 +371,8 @@ void scroll_map_horizontal(float dx)
 void set_cursor_pos(int x, int y)
 {
     COORD coord;
-    coord.X = x;
-    coord.Y = y;
+    coord.X = static_cast<SHORT>(x);
+    coord.Y = static_cast<SHORT>(y);
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
