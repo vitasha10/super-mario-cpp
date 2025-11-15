@@ -37,19 +37,21 @@ typedef struct SObject {
 char screen_buffer[MAP_HEIGHT][MAP_WIDTH + 1];
 TObject mario;
 
-TObject *bricks = NULL;
+TObject *bricks = nullptr;
 int bricks_count;
 
-TObject *mobs = NULL;
+TObject *mobs = nullptr;
 int mobs_count;
 
 int level = 1;
 int score;
 int max_level;
 
+WORD default_color = 0x9F; // Базовый цвет игры (фон ярко-синий, текст белый)
+
 void sleep_ms(unsigned ms);
 void set_console_color(unsigned short color);
-
+void apply_color_to_entire_buffer(WORD color); // (опционально)
 void clear_map();
 void render_map();
 void set_object_pos(TObject *obj, float xPos, float yPos);
@@ -86,6 +88,19 @@ void set_console_color(unsigned short color)
     SetConsoleTextAttribute(hConsole, color);
 }
 
+// (Опционально) Полное перекрашивание буфера в текущий цвет (для эффекта вспышки)
+void apply_color_to_entire_buffer(WORD color)
+{
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    if (!GetConsoleScreenBufferInfo(hConsole, &csbi)) return;
+    DWORD cells = csbi.dwSize.X * csbi.dwSize.Y;
+    COORD home = {0, 0};
+    DWORD written;
+    // Перекрашиваем атрибуты всех ячеек
+    FillConsoleOutputAttribute(hConsole, color, cells, home, &written);
+}
+
 void clear_map()
 {
     for (int i = 0; i < MAP_WIDTH; i++)
@@ -101,9 +116,7 @@ void render_map()
     std::string output;
     output.reserve(MAP_HEIGHT * (MAP_WIDTH + 1));
     for (int j = 0; j < MAP_HEIGHT; j++)
-    {
         output += screen_buffer[j];
-    }
     std::cout << output << std::flush;
 }
 
@@ -125,8 +138,11 @@ void init_object(TObject *obj, float xPos, float yPos, float oWidth, float oHeig
 
 void handle_player_death()
 {
+    // Красный фон на 0.5 сек + принудительная перерисовка
     set_console_color(0x4F);
+    render_frame();            // Показать текущий кадр в красном
     sleep_ms(500);
+    set_console_color(default_color);
     load_level(level);
 }
 
@@ -149,15 +165,12 @@ void draw_score_on_map()
     std::string score_text = "Score: " + std::to_string(score);
     int len = static_cast<int>(score_text.length());
     for (int i = 0; i < len; i++)
-    {
         if (i + 5 < MAP_WIDTH)
             screen_buffer[1][i + 5] = score_text[i];
-    }
 }
 
 void load_level(int lvl)
 {
-    set_console_color(0x9F);
     bricks_count = 0;
     bricks = static_cast<TObject*>(std::realloc(bricks, 0));
     mobs_count = 0;
@@ -185,7 +198,7 @@ void load_level(int lvl)
         init_object(add_mob(), 25, 10, 3, 2, CHAR_ENEMY);
         init_object(add_mob(), 80, 10, 3, 2, CHAR_ENEMY);
     }
-    if (lvl == 2)
+    else if (lvl == 2)
     {
         init_object(add_brick(), 20, 20, 40, 5, CHAR_BRICK);
         init_object(add_brick(), 60, 15, 10, 10, CHAR_BRICK);
@@ -201,7 +214,7 @@ void load_level(int lvl)
         init_object(add_mob(), 160, 10, 3, 2, CHAR_ENEMY);
         init_object(add_mob(), 175, 10, 3, 2, CHAR_ENEMY);
     }
-    if (lvl == 3)
+    else if (lvl == 3)
     {
         init_object(add_brick(), 20, 20, 40, 5, CHAR_BRICK);
         init_object(add_brick(), 80, 20, 15, 5, CHAR_BRICK);
@@ -240,14 +253,18 @@ void move_object_vertical(TObject *obj)
             obj->y -= obj->vy;
             obj->vy = 0;
 
-            // Level transition when hitting goal
             if (bricks[i].glyph == CHAR_GOAL)
             {
                 level++;
                 if (level > max_level)
                     level = 1;
+
+                // Зелёный фон при «победе» перед переходом
                 set_console_color(0x2F);
+                render_frame();   // Показать зелёный кадр
                 sleep_ms(500);
+                set_console_color(default_color);
+
                 load_level(level);
             }
             break;
@@ -264,7 +281,7 @@ void remove_mob_by_index(int i)
 
 bool is_stomp_kill(const TObject& player, const TObject& enemy)
 {
-    return (player.is_flying == true) &&
+    return player.is_flying &&
            (player.vy > 0) &&
            (player.y + player.height < enemy.y + enemy.height * 0.5f);
 }
@@ -300,9 +317,7 @@ void handle_mario_collisions()
         }
 
         if (is_coin_pickup(mobs[i]))
-        {
             add_score_and_remove_mob(POINTS_FOR_COIN, i);
-        }
     }
 }
 
@@ -324,7 +339,7 @@ void move_object_horizontal(TObject *obj)
     {
         TObject tmp = *obj;
         move_object_vertical(&tmp);
-        if (tmp.is_flying == true)
+        if (tmp.is_flying)
         {
             obj->x -= obj->vx;
             obj->vx = -obj->vx;
@@ -344,8 +359,8 @@ void place_object_on_map(const TObject obj)
     int iWidth = static_cast<int>(std::round(obj.width));
     int iHeight = static_cast<int>(std::round(obj.height));
 
-    for (int i = ix; i < (ix + iWidth); i++)
-        for (int j = iy; j < (iy + iHeight); j++)
+    for (int i = ix; i < ix + iWidth; i++)
+        for (int j = iy; j < iy + iHeight; j++)
             if (is_within_map(i, j))
                 screen_buffer[j][i] = obj.glyph;
 }
@@ -354,13 +369,12 @@ void scroll_map_horizontal(float dx)
 {
     mario.x -= dx;
     for (int i = 0; i < bricks_count; i++)
-    {
         if (check_collision(mario, bricks[i]))
         {
             mario.x += dx;
             return;
         }
-    }
+
     mario.x += dx;
     for (int i = 0; i < bricks_count; i++)
         bricks[i].x += dx;
@@ -378,13 +392,13 @@ void set_cursor_pos(int x, int y)
 
 bool check_collision(const TObject o1, const TObject o2)
 {
-    return ((o1.x + o1.width) > o2.x) && (o1.x < (o2.x + o2.width)) &&
-           ((o1.y + o1.height) > o2.y) && (o1.y < (o2.y + o2.height));
+    return (o1.x + o1.width > o2.x) && (o1.x < o2.x + o2.width) &&
+           (o1.y + o1.height > o2.y) && (o1.y < o2.y + o2.height);
 }
 
 void handle_input()
 {
-    if ((mario.is_flying == false) && (GetKeyState(VK_SPACE) < 0))
+    if (!mario.is_flying && (GetKeyState(VK_SPACE) < 0))
         mario.vy = JUMP_IMPULSE;
     if (GetKeyState('A') < 0)
         scroll_map_horizontal(1);
@@ -415,7 +429,6 @@ void update_world()
 void render_frame()
 {
     clear_map();
-
     for (int i = 0; i < bricks_count; i++)
         place_object_on_map(bricks[i]);
     for (int i = 0; i < mobs_count; i++)
@@ -432,6 +445,7 @@ int main()
     std::ios_base::sync_with_stdio(false);
     std::cin.tie(nullptr);
 
+    set_console_color(default_color);
     load_level(level);
 
     do
