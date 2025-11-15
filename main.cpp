@@ -3,6 +3,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
+#include <string>
 #include <windows.h>
 
 #define mapWidth 80
@@ -79,8 +81,13 @@ void clear_map()
 void render_map()
 {
     screen_buffer[mapHeight - 1][mapWidth] = '\0';
+    std::string output;
+    output.reserve(mapHeight * (mapWidth + 1));
     for (int j = 0; j < mapHeight; j++)
-        printf("%s", screen_buffer[j]);
+    {
+        output += screen_buffer[j];
+    }
+    std::cout << output << std::flush;
 }
 
 void set_object_pos(TObject *obj, float xPos, float yPos)
@@ -122,12 +129,11 @@ TObject *add_mob()
 
 void draw_score_on_map()
 {
-    char c[30];
-    snprintf(c, sizeof(c), "Score: %d", score);
-    int len = strlen(c);
+    std::string score_text = "Score: " + std::to_string(score);
+    int len = score_text.length();
     for (int i = 0; i < len; i++)
     {
-        screen_buffer[1][i + 5] = c[i];
+        screen_buffer[1][i + 5] = score_text[i];
     }
 }
 
@@ -393,6 +399,9 @@ void render_frame()
 
 int main()
 {
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+
     load_level(level);
 
     do
