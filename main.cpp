@@ -47,6 +47,9 @@ int level = 1;
 int score;
 int max_level;
 
+void sleep_ms(unsigned ms);
+void set_console_color(unsigned short color);
+
 void clear_map();
 void render_map();
 void set_object_pos(TObject *obj, float xPos, float yPos);
@@ -68,6 +71,17 @@ bool check_collision(const TObject o1, const TObject o2);
 void handle_input();
 void update_world();
 void render_frame();
+
+void sleep_ms(unsigned ms)
+{
+    Sleep(ms);
+}
+
+void set_console_color(unsigned short color)
+{
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, color);
+}
 
 void clear_map()
 {
@@ -108,8 +122,8 @@ void init_object(TObject *obj, float xPos, float yPos, float oWidth, float oHeig
 
 void handle_player_death()
 {
-    system("color 4F");
-    Sleep(500);
+    set_console_color(0x4F);
+    sleep_ms(500);
     load_level(level);
 }
 
@@ -139,7 +153,7 @@ void draw_score_on_map()
 
 void load_level(int lvl)
 {
-    system("color 9F");
+    set_console_color(0x9F);
     bricks_count = 0;
     bricks = realloc(bricks, 0);
     mobs_count = 0;
@@ -227,8 +241,8 @@ void move_object_vertical(TObject *obj)
                 level++;
                 if (level > max_level)
                     level = 1;
-                system("color 2F");
-                Sleep(500);
+                set_console_color(0x2F);
+                sleep_ms(500);
                 load_level(level);
             }
             break;
@@ -409,7 +423,7 @@ int main()
         handle_input();
         update_world();
         render_frame();
-        Sleep(FRAME_DELAY_MS);
+        sleep_ms(FRAME_DELAY_MS);
     } while (GetKeyState(VK_ESCAPE) >= 0);
 
     return 0;
