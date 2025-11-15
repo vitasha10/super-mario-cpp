@@ -82,18 +82,18 @@ void ShowMap()
 
 void SetObjectPos(TObject *obj, float xPos, float yPos)
 {
-    (*obj).x = xPos;
-    (*obj).y = yPos;
+    obj->x = xPos;
+    obj->y = yPos;
 }
 
 void InitObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeight, char inType)
 {
     SetObjectPos(obj, xPos, yPos);
-    (*obj).width = oWidth;
-    (*obj).height = oHeight;
-    (*obj).vertSpeed = 0;
-    (*obj).cType = inType;
-    (*obj).horizSpeed = MOB_HORIZONTAL_SPEED;
+    obj->width = oWidth;
+    obj->height = oHeight;
+    obj->vertSpeed = 0;
+    obj->cType = inType;
+    obj->horizSpeed = MOB_HORIZONTAL_SPEED;
 }
 
 void PlayerDead()
@@ -193,25 +193,25 @@ void CreateLevel(int lvl)
 
 void VertMoveObject(TObject *obj)
 {
-    (*obj).IsFly = true;
-    (*obj).vertSpeed += GRAVITY;
-    SetObjectPos(obj, (*obj).x, (*obj).y + (*obj).vertSpeed);
+    obj->IsFly = true;
+    obj->vertSpeed += GRAVITY;
+    SetObjectPos(obj, obj->x, obj->y + obj->vertSpeed);
     for (int i = 0; i < brickLength; i++)
     {
         if (IsCollision(*obj, brick[i]))
         {
-            if (obj[0].vertSpeed > 0)
-                obj[0].IsFly = false;
+            if (obj->vertSpeed > 0)
+                obj->IsFly = false;
 
-            if ((brick[i].cType == CHAR_QUESTION_BLOCK) && (obj[0].vertSpeed < 0) && (obj == &mario))
+            if ((brick[i].cType == CHAR_QUESTION_BLOCK) && (obj->vertSpeed < 0) && (obj == &mario))
             {
                 brick[i].cType = CHAR_USED_BLOCK;
                 InitObject(GetNewMoving(), brick[i].x, brick[i].y - 3, 3, 2, CHAR_COIN);
                 moving[movingLength - 1].vertSpeed = -0.7;
             }
 
-            (*obj).y -= (*obj).vertSpeed;
-            (*obj).vertSpeed = 0;
+            obj->y -= obj->vertSpeed;
+            obj->vertSpeed = 0;
 
             if (brick[i].cType == CHAR_GOAL)
             {
@@ -269,26 +269,26 @@ void MarioCollision()
 
 void HorizonMoveObject(TObject *obj)
 {
-    obj[0].x += obj[0].horizSpeed;
+    obj->x += obj->horizSpeed;
 
     for (int i = 0; i < brickLength; i++)
     {
-        if (IsCollision(obj[0], brick[i]))
+        if (IsCollision(*obj, brick[i]))
         {
-            obj[0].x -= obj[0].horizSpeed;
-            obj[0].horizSpeed = -obj[0].horizSpeed;
+            obj->x -= obj->horizSpeed;
+            obj->horizSpeed = -obj->horizSpeed;
             return;
         }
     }
 
-    if (obj[0].cType == CHAR_ENEMY)
+    if (obj->cType == CHAR_ENEMY)
     {
         TObject tmp = *obj;
         VertMoveObject(&tmp);
         if (tmp.IsFly == true)
         {
-            obj[0].x -= obj[0].horizSpeed;
-            obj[0].horizSpeed = -obj[0].horizSpeed;
+            obj->x -= obj->horizSpeed;
+            obj->horizSpeed = -obj->horizSpeed;
         }
     }
 }
