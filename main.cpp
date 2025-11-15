@@ -63,6 +63,9 @@ void place_object_on_map(const TObject obj);
 void scroll_map_horizontal(float dx);
 void set_cursor_pos(int x, int y);
 bool check_collision(const TObject o1, const TObject o2);
+void handle_input();
+void update_world();
+void render_frame();
 
 void clear_map()
 {
@@ -343,45 +346,60 @@ bool check_collision(const TObject o1, const TObject o2)
            ((o1.y + o1.height) > o2.y) && (o1.y < (o2.y + o2.height));
 }
 
+void handle_input()
+{
+    if ((mario.is_flying == false) && (GetKeyState(VK_SPACE) < 0))
+        mario.vy = JUMP_IMPULSE;
+    if (GetKeyState('A') < 0)
+        scroll_map_horizontal(1);
+    if (GetKeyState('D') < 0)
+        scroll_map_horizontal(-1);
+}
+
+void update_world()
+{
+    if (mario.y > mapHeight)
+        handle_player_death();
+
+    move_object_vertical(&mario);
+    handle_mario_collisions();
+
+    for (int i = 0; i < mobs_count; i++)
+    {
+        move_object_vertical(mobs + i);
+        move_object_horizontal(mobs + i);
+        if (mobs[i].y > mapHeight)
+        {
+            remove_mob_by_index(i);
+            i--;
+        }
+    }
+}
+
+void render_frame()
+{
+    clear_map();
+
+    for (int i = 0; i < bricks_count; i++)
+        place_object_on_map(bricks[i]);
+    for (int i = 0; i < mobs_count; i++)
+        place_object_on_map(mobs[i]);
+    place_object_on_map(mario);
+    draw_score_on_map();
+
+    set_cursor_pos(0, 0);
+    render_map();
+}
+
 int main()
 {
     load_level(level);
 
     do
     {
-        clear_map();
-
-        if ((mario.is_flying == false) && (GetKeyState(VK_SPACE) < 0))
-            mario.vy = JUMP_IMPULSE;
-        if (GetKeyState('A') < 0)
-            scroll_map_horizontal(1);
-        if (GetKeyState('D') < 0)
-            scroll_map_horizontal(-1);
-
-        if (mario.y > mapHeight)
-            handle_player_death();
-
-        move_object_vertical(&mario);
-        handle_mario_collisions();
-
-        for (int i = 0; i < bricks_count; i++)
-            place_object_on_map(bricks[i]);
-        for (int i = 0; i < mobs_count; i++)
-        {
-            move_object_vertical(mobs + i);
-            move_object_horizontal(mobs + i);
-            if (mobs[i].y > mapHeight)
-            {
-                remove_mob_by_index(i);
-                i--;
-                continue;
-            }
-            place_object_on_map(mobs[i]);
-        }
-        place_object_on_map(mario);
-        draw_score_on_map();
-        set_cursor_pos(0, 0);
-        render_map();
+        handle_input();
+        update_world();
+        render_frame();
         Sleep(FRAME_DELAY_MS);
     } while (GetKeyState(VK_ESCAPE) >= 0);
 
