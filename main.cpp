@@ -88,7 +88,6 @@ void set_console_color(unsigned short color)
     SetConsoleTextAttribute(hConsole, color);
 }
 
-// (Опционально) Полное перекрашивание буфера в текущий цвет (для эффекта вспышки)
 void apply_color_to_entire_buffer(WORD color)
 {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -97,7 +96,6 @@ void apply_color_to_entire_buffer(WORD color)
     DWORD cells = csbi.dwSize.X * csbi.dwSize.Y;
     COORD home = {0, 0};
     DWORD written;
-    // Перекрашиваем атрибуты всех ячеек
     FillConsoleOutputAttribute(hConsole, color, cells, home, &written);
 }
 
