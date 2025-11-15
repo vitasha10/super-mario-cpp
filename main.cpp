@@ -7,8 +7,8 @@
 #include <string>
 #include <windows.h>
 
-#define mapWidth 80
-#define mapHeight 25
+constexpr int MAP_WIDTH = 80;
+constexpr int MAP_HEIGHT = 25;
 
 constexpr float GRAVITY = 0.05f;
 constexpr float MOB_HORIZONTAL_SPEED = 0.2f;
@@ -34,7 +34,7 @@ typedef struct SObject {
     float vx;
 } TObject;
 
-char screen_buffer[mapHeight][mapWidth + 1];
+char screen_buffer[MAP_HEIGHT][MAP_WIDTH + 1];
 TObject mario;
 
 TObject *bricks = NULL;
@@ -88,19 +88,19 @@ void set_console_color(unsigned short color)
 
 void clear_map()
 {
-    for (int i = 0; i < mapWidth; i++)
+    for (int i = 0; i < MAP_WIDTH; i++)
         screen_buffer[0][i] = ' ';
-    screen_buffer[0][mapWidth] = '\0';
-    for (int j = 1; j < mapHeight; j++)
+    screen_buffer[0][MAP_WIDTH] = '\0';
+    for (int j = 1; j < MAP_HEIGHT; j++)
         snprintf(screen_buffer[j], sizeof(screen_buffer[j]), "%s", screen_buffer[0]);
 }
 
 void render_map()
 {
-    screen_buffer[mapHeight - 1][mapWidth] = '\0';
+    screen_buffer[MAP_HEIGHT - 1][MAP_WIDTH] = '\0';
     std::string output;
-    output.reserve(mapHeight * (mapWidth + 1));
-    for (int j = 0; j < mapHeight; j++)
+    output.reserve(MAP_HEIGHT * (MAP_WIDTH + 1));
+    for (int j = 0; j < MAP_HEIGHT; j++)
     {
         output += screen_buffer[j];
     }
@@ -333,7 +333,7 @@ void move_object_horizontal(TObject *obj)
 
 bool is_within_map(int x, int y)
 {
-    return (x >= 0) && (x < mapWidth) && (y >= 0) && (y < mapHeight);
+    return (x >= 0) && (x < MAP_WIDTH) && (y >= 0) && (y < MAP_HEIGHT);
 }
 
 void place_object_on_map(const TObject obj)
@@ -393,7 +393,7 @@ void handle_input()
 
 void update_world()
 {
-    if (mario.y > mapHeight)
+    if (mario.y > MAP_HEIGHT)
         handle_player_death();
 
     move_object_vertical(&mario);
@@ -403,7 +403,7 @@ void update_world()
     {
         move_object_vertical(mobs + i);
         move_object_horizontal(mobs + i);
-        if (mobs[i].y > mapHeight)
+        if (mobs[i].y > MAP_HEIGHT)
         {
             remove_mob_by_index(i);
             i--;
