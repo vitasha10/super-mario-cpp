@@ -8,6 +8,21 @@
 #define mapWidth 80
 #define mapHeight 25
 
+constexpr float GRAVITY = 0.05f;
+constexpr float MOB_HORIZONTAL_SPEED = 0.2f;
+constexpr float JUMP_IMPULSE = -1.0f;
+constexpr int FRAME_DELAY_MS = 10;
+constexpr int POINTS_FOR_ENEMY = 50;
+constexpr int POINTS_FOR_COIN = 100;
+
+constexpr char CHAR_BRICK = '#';
+constexpr char CHAR_QUESTION_BLOCK = '?';
+constexpr char CHAR_USED_BLOCK = '-';
+constexpr char CHAR_GOAL = '+';
+constexpr char CHAR_ENEMY = 'o';
+constexpr char CHAR_COIN = '$';
+constexpr char CHAR_MARIO = '@';
+
 typedef struct SObject {
     float x, y;
     float width, height;
@@ -78,7 +93,7 @@ void InitObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeigh
     (*obj).height = oHeight;
     (*obj).vertSpeed = 0;
     (*obj).cType = inType;
-    (*obj).horizSpeed = 0.2;
+    (*obj).horizSpeed = MOB_HORIZONTAL_SPEED;
 }
 
 void PlayerDead()
@@ -121,57 +136,57 @@ void CreateLevel(int lvl)
     movingLength = 0;
     moving = realloc(moving, 0);
 
-    InitObject(&mario, 39, 10, 3, 3, '@');
+    InitObject(&mario, 39, 10, 3, 3, CHAR_MARIO);
     score = 0;
 
     if (lvl == 1)
     {
-        InitObject(GetNewBrick(), 20, 20, 40, 5, '#');
-        InitObject(GetNewBrick(), 30, 10, 5, 3, '?');
-        InitObject(GetNewBrick(), 50, 10, 5, 3, '?');
-        InitObject(GetNewBrick(), 60, 15, 40, 10, '#');
-        InitObject(GetNewBrick(), 60, 5, 10, 3, '-');
-        InitObject(GetNewBrick(), 70, 5, 5, 3, '?');
-        InitObject(GetNewBrick(), 75, 5, 5, 3, '-');
-        InitObject(GetNewBrick(), 80, 5, 5, 3, '?');
-        InitObject(GetNewBrick(), 85, 5, 10, 3, '-');
-        InitObject(GetNewBrick(), 100, 20, 20, 5, '#');
-        InitObject(GetNewBrick(), 120, 15, 10, 10, '#');
-        InitObject(GetNewBrick(), 150, 20, 40, 5, '#');
-        InitObject(GetNewBrick(), 210, 15, 10, 1, '+');
+        InitObject(GetNewBrick(), 20, 20, 40, 5, CHAR_BRICK);
+        InitObject(GetNewBrick(), 30, 10, 5, 3, CHAR_QUESTION_BLOCK);
+        InitObject(GetNewBrick(), 50, 10, 5, 3, CHAR_QUESTION_BLOCK);
+        InitObject(GetNewBrick(), 60, 15, 40, 10, CHAR_BRICK);
+        InitObject(GetNewBrick(), 60, 5, 10, 3, CHAR_USED_BLOCK);
+        InitObject(GetNewBrick(), 70, 5, 5, 3, CHAR_QUESTION_BLOCK);
+        InitObject(GetNewBrick(), 75, 5, 5, 3, CHAR_USED_BLOCK);
+        InitObject(GetNewBrick(), 80, 5, 5, 3, CHAR_QUESTION_BLOCK);
+        InitObject(GetNewBrick(), 85, 5, 10, 3, CHAR_USED_BLOCK);
+        InitObject(GetNewBrick(), 100, 20, 20, 5, CHAR_BRICK);
+        InitObject(GetNewBrick(), 120, 15, 10, 10, CHAR_BRICK);
+        InitObject(GetNewBrick(), 150, 20, 40, 5, CHAR_BRICK);
+        InitObject(GetNewBrick(), 210, 15, 10, 1, CHAR_GOAL);
 
-        InitObject(GetNewMoving(), 25, 10, 3, 2, 'o');
-        InitObject(GetNewMoving(), 80, 10, 3, 2, 'o');
+        InitObject(GetNewMoving(), 25, 10, 3, 2, CHAR_ENEMY);
+        InitObject(GetNewMoving(), 80, 10, 3, 2, CHAR_ENEMY);
     }
     if (lvl == 2)
     {
-        InitObject(GetNewBrick(), 20, 20, 40, 5, '#');
-        InitObject(GetNewBrick(), 60, 15, 10, 10, '#');
-        InitObject(GetNewBrick(), 80, 20, 20, 5, '#');
-        InitObject(GetNewBrick(), 120, 15, 10, 10, '#');
-        InitObject(GetNewBrick(), 150, 20, 40, 5, '#');
-        InitObject(GetNewBrick(), 210, 15, 10, 1, '+');
+        InitObject(GetNewBrick(), 20, 20, 40, 5, CHAR_BRICK);
+        InitObject(GetNewBrick(), 60, 15, 10, 10, CHAR_BRICK);
+        InitObject(GetNewBrick(), 80, 20, 20, 5, CHAR_BRICK);
+        InitObject(GetNewBrick(), 120, 15, 10, 10, CHAR_BRICK);
+        InitObject(GetNewBrick(), 150, 20, 40, 5, CHAR_BRICK);
+        InitObject(GetNewBrick(), 210, 15, 10, 1, CHAR_GOAL);
 
-        InitObject(GetNewMoving(), 25, 10, 3, 2, 'o');
-        InitObject(GetNewMoving(), 80, 10, 3, 2, 'o');
-        InitObject(GetNewMoving(), 65, 10, 3, 2, 'o');
-        InitObject(GetNewMoving(), 120, 10, 3, 2, 'o');
-        InitObject(GetNewMoving(), 160, 10, 3, 2, 'o');
-        InitObject(GetNewMoving(), 175, 10, 3, 2, 'o');
+        InitObject(GetNewMoving(), 25, 10, 3, 2, CHAR_ENEMY);
+        InitObject(GetNewMoving(), 80, 10, 3, 2, CHAR_ENEMY);
+        InitObject(GetNewMoving(), 65, 10, 3, 2, CHAR_ENEMY);
+        InitObject(GetNewMoving(), 120, 10, 3, 2, CHAR_ENEMY);
+        InitObject(GetNewMoving(), 160, 10, 3, 2, CHAR_ENEMY);
+        InitObject(GetNewMoving(), 175, 10, 3, 2, CHAR_ENEMY);
     }
     if (lvl == 3)
     {
-        InitObject(GetNewBrick(), 20, 20, 40, 5, '#');
-        InitObject(GetNewBrick(), 80, 20, 15, 5, '#');
-        InitObject(GetNewBrick(), 120, 15, 15, 10, '#');
-        InitObject(GetNewBrick(), 160, 10, 15, 15, '+');
+        InitObject(GetNewBrick(), 20, 20, 40, 5, CHAR_BRICK);
+        InitObject(GetNewBrick(), 80, 20, 15, 5, CHAR_BRICK);
+        InitObject(GetNewBrick(), 120, 15, 15, 10, CHAR_BRICK);
+        InitObject(GetNewBrick(), 160, 10, 15, 15, CHAR_GOAL);
 
-        InitObject(GetNewMoving(), 25, 10, 3, 2, 'o');
-        InitObject(GetNewMoving(), 50, 10, 3, 2, 'o');
-        InitObject(GetNewMoving(), 80, 10, 3, 2, 'o');
-        InitObject(GetNewMoving(), 90, 10, 3, 2, 'o');
-        InitObject(GetNewMoving(), 120, 10, 3, 2, 'o');
-        InitObject(GetNewMoving(), 130, 10, 3, 2, 'o');
+        InitObject(GetNewMoving(), 25, 10, 3, 2, CHAR_ENEMY);
+        InitObject(GetNewMoving(), 50, 10, 3, 2, CHAR_ENEMY);
+        InitObject(GetNewMoving(), 80, 10, 3, 2, CHAR_ENEMY);
+        InitObject(GetNewMoving(), 90, 10, 3, 2, CHAR_ENEMY);
+        InitObject(GetNewMoving(), 120, 10, 3, 2, CHAR_ENEMY);
+        InitObject(GetNewMoving(), 130, 10, 3, 2, CHAR_ENEMY);
     }
     maxLvl = 3;
 }
@@ -179,7 +194,7 @@ void CreateLevel(int lvl)
 void VertMoveObject(TObject *obj)
 {
     (*obj).IsFly = TRUE;
-    (*obj).vertSpeed += 0.05;
+    (*obj).vertSpeed += GRAVITY;
     SetObjectPos(obj, (*obj).x, (*obj).y + (*obj).vertSpeed);
     for (int i = 0; i < brickLength; i++)
     {
@@ -188,17 +203,17 @@ void VertMoveObject(TObject *obj)
             if (obj[0].vertSpeed > 0)
                 obj[0].IsFly = FALSE;
 
-            if ((brick[i].cType == '?') && (obj[0].vertSpeed < 0) && (obj == &mario))
+            if ((brick[i].cType == CHAR_QUESTION_BLOCK) && (obj[0].vertSpeed < 0) && (obj == &mario))
             {
-                brick[i].cType = '-';
-                InitObject(GetNewMoving(), brick[i].x, brick[i].y - 3, 3, 2, '$');
+                brick[i].cType = CHAR_USED_BLOCK;
+                InitObject(GetNewMoving(), brick[i].x, brick[i].y - 3, 3, 2, CHAR_COIN);
                 moving[movingLength - 1].vertSpeed = -0.7;
             }
 
             (*obj).y -= (*obj).vertSpeed;
             (*obj).vertSpeed = 0;
 
-            if (brick[i].cType == '+')
+            if (brick[i].cType == CHAR_GOAL)
             {
                 level++;
                 if (level > maxLvl)
@@ -225,13 +240,13 @@ void MarioCollision()
     {
         if (IsCollision(mario, moving[i]))
         {
-            if (moving[i].cType == 'o')
+            if (moving[i].cType == CHAR_ENEMY)
             {
                 if ((mario.IsFly == TRUE) &&
                     (mario.vertSpeed > 0) &&
                     (mario.y + mario.height < moving[i].y + moving[i].height * 0.5))
                 {
-                    score += 50;
+                    score += POINTS_FOR_ENEMY;
                     DeleteMoving(i);
                     i--;
                     continue;
@@ -241,9 +256,9 @@ void MarioCollision()
                     PlayerDead();
                 }
             }
-            if (moving[i].cType == '$')
+            if (moving[i].cType == CHAR_COIN)
             {
-                score += 100;
+                score += POINTS_FOR_COIN;
                 DeleteMoving(i);
                 i--;
                 continue;
@@ -266,7 +281,7 @@ void HorizonMoveObject(TObject *obj)
         }
     }
 
-    if (obj[0].cType == 'o')
+    if (obj[0].cType == CHAR_ENEMY)
     {
         TObject tmp = *obj;
         VertMoveObject(&tmp);
@@ -337,7 +352,7 @@ int main()
         ClearMap();
 
         if ((mario.IsFly == FALSE) && (GetKeyState(VK_SPACE) < 0))
-            mario.vertSpeed = -1;
+            mario.vertSpeed = JUMP_IMPULSE;
         if (GetKeyState('A') < 0)
             HorizonMoveMap(1);
         if (GetKeyState('D') < 0)
@@ -367,7 +382,7 @@ int main()
         PutScoreOnMap();
         SetCur(0, 0);
         ShowMap();
-        Sleep(10);
+        Sleep(FRAME_DELAY_MS);
     } while (GetKeyState(VK_ESCAPE) >= 0);
 
     return 0;
