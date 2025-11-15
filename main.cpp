@@ -1,4 +1,4 @@
-// Теперь уровень можно пройти
+// Super Mario C++ - Simple platformer game
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
@@ -239,6 +239,7 @@ void move_object_vertical(TObject *obj)
             obj->y -= obj->vy;
             obj->vy = 0;
 
+            // Level transition when hitting goal
             if (bricks[i].glyph == CHAR_GOAL)
             {
                 level++;
