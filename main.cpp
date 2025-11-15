@@ -26,24 +26,24 @@ constexpr char CHAR_MARIO = '@';
 typedef struct SObject {
     float x, y;
     float width, height;
-    float vertSpeed;
-    bool IsFly;
-    char cType;
-    float horizSpeed;
+    float vy;
+    bool is_flying;
+    char glyph;
+    float vx;
 } TObject;
 
-char map[mapHeight][mapWidth + 1];
+char screen_buffer[mapHeight][mapWidth + 1];
 TObject mario;
 
-TObject *brick = NULL;
-int brickLength;
+TObject *bricks = NULL;
+int bricks_count;
 
-TObject *moving = NULL;
-int movingLength;
+TObject *mobs = NULL;
+int mobs_count;
 
 int level = 1;
 int score;
-int maxLvl;
+int max_level;
 
 void clear_map();
 void render_map();
@@ -67,17 +67,17 @@ bool check_collision(const TObject o1, const TObject o2);
 void clear_map()
 {
     for (int i = 0; i < mapWidth; i++)
-        map[0][i] = ' ';
-    map[0][mapWidth] = '\0';
+        screen_buffer[0][i] = ' ';
+    screen_buffer[0][mapWidth] = '\0';
     for (int j = 1; j < mapHeight; j++)
-        snprintf(map[j], sizeof(map[j]), "%s", map[0]);
+        snprintf(screen_buffer[j], sizeof(screen_buffer[j]), "%s", screen_buffer[0]);
 }
 
 void render_map()
 {
-    map[mapHeight - 1][mapWidth] = '\0';
+    screen_buffer[mapHeight - 1][mapWidth] = '\0';
     for (int j = 0; j < mapHeight; j++)
-        printf("%s", map[j]);
+        printf("%s", screen_buffer[j]);
 }
 
 void set_object_pos(TObject *obj, float xPos, float yPos)
@@ -91,9 +91,9 @@ void init_object(TObject *obj, float xPos, float yPos, float oWidth, float oHeig
     set_object_pos(obj, xPos, yPos);
     obj->width = oWidth;
     obj->height = oHeight;
-    obj->vertSpeed = 0;
-    obj->cType = inType;
-    obj->horizSpeed = MOB_HORIZONTAL_SPEED;
+    obj->vy = 0;
+    obj->glyph = inType;
+    obj->vx = MOB_HORIZONTAL_SPEED;
 }
 
 void handle_player_death()
@@ -105,16 +105,16 @@ void handle_player_death()
 
 TObject *add_brick()
 {
-    brickLength++;
-    brick = realloc(brick, sizeof(*brick) * brickLength);
-    return brick + brickLength - 1;
+    bricks_count++;
+    bricks = realloc(bricks, sizeof(*bricks) * bricks_count);
+    return bricks + bricks_count - 1;
 }
 
 TObject *add_mob()
 {
-    movingLength++;
-    moving = realloc(moving, sizeof(*moving) * movingLength);
-    return moving + movingLength - 1;
+    mobs_count++;
+    mobs = realloc(mobs, sizeof(*mobs) * mobs_count);
+    return mobs + mobs_count - 1;
 }
 
 void draw_score_on_map()
@@ -124,17 +124,17 @@ void draw_score_on_map()
     int len = strlen(c);
     for (int i = 0; i < len; i++)
     {
-        map[1][i + 5] = c[i];
+        screen_buffer[1][i + 5] = c[i];
     }
 }
 
 void load_level(int lvl)
 {
     system("color 9F");
-    brickLength = 0;
-    brick = realloc(brick, 0);
-    movingLength = 0;
-    moving = realloc(moving, 0);
+    bricks_count = 0;
+    bricks = realloc(bricks, 0);
+    mobs_count = 0;
+    mobs = realloc(mobs, 0);
 
     init_object(&mario, 39, 10, 3, 3, CHAR_MARIO);
     score = 0;
@@ -188,35 +188,35 @@ void load_level(int lvl)
         init_object(add_mob(), 120, 10, 3, 2, CHAR_ENEMY);
         init_object(add_mob(), 130, 10, 3, 2, CHAR_ENEMY);
     }
-    maxLvl = 3;
+    max_level = 3;
 }
 
 void move_object_vertical(TObject *obj)
 {
-    obj->IsFly = true;
-    obj->vertSpeed += GRAVITY;
-    set_object_pos(obj, obj->x, obj->y + obj->vertSpeed);
-    for (int i = 0; i < brickLength; i++)
+    obj->is_flying = true;
+    obj->vy += GRAVITY;
+    set_object_pos(obj, obj->x, obj->y + obj->vy);
+    for (int i = 0; i < bricks_count; i++)
     {
-        if (check_collision(*obj, brick[i]))
+        if (check_collision(*obj, bricks[i]))
         {
-            if (obj->vertSpeed > 0)
-                obj->IsFly = false;
+            if (obj->vy > 0)
+                obj->is_flying = false;
 
-            if ((brick[i].cType == CHAR_QUESTION_BLOCK) && (obj->vertSpeed < 0) && (obj == &mario))
+            if ((bricks[i].glyph == CHAR_QUESTION_BLOCK) && (obj->vy < 0) && (obj == &mario))
             {
-                brick[i].cType = CHAR_USED_BLOCK;
-                init_object(add_mob(), brick[i].x, brick[i].y - 3, 3, 2, CHAR_COIN);
-                moving[movingLength - 1].vertSpeed = -0.7;
+                bricks[i].glyph = CHAR_USED_BLOCK;
+                init_object(add_mob(), bricks[i].x, bricks[i].y - 3, 3, 2, CHAR_COIN);
+                mobs[mobs_count - 1].vy = -0.7;
             }
 
-            obj->y -= obj->vertSpeed;
-            obj->vertSpeed = 0;
+            obj->y -= obj->vy;
+            obj->vy = 0;
 
-            if (brick[i].cType == CHAR_GOAL)
+            if (bricks[i].glyph == CHAR_GOAL)
             {
                 level++;
-                if (level > maxLvl)
+                if (level > max_level)
                     level = 1;
                 system("color 2F");
                 Sleep(500);
@@ -229,22 +229,22 @@ void move_object_vertical(TObject *obj)
 
 void remove_mob_by_index(int i)
 {
-    movingLength--;
-    moving[i] = moving[movingLength];
-    moving = realloc(moving, sizeof(*moving) * movingLength);
+    mobs_count--;
+    mobs[i] = mobs[mobs_count];
+    mobs = realloc(mobs, sizeof(*mobs) * mobs_count);
 }
 
 void handle_mario_collisions()
 {
-    for (int i = 0; i < movingLength; i++)
+    for (int i = 0; i < mobs_count; i++)
     {
-        if (check_collision(mario, moving[i]))
+        if (check_collision(mario, mobs[i]))
         {
-            if (moving[i].cType == CHAR_ENEMY)
+            if (mobs[i].glyph == CHAR_ENEMY)
             {
-                if ((mario.IsFly == true) &&
-                    (mario.vertSpeed > 0) &&
-                    (mario.y + mario.height < moving[i].y + moving[i].height * 0.5))
+                if ((mario.is_flying == true) &&
+                    (mario.vy > 0) &&
+                    (mario.y + mario.height < mobs[i].y + mobs[i].height * 0.5))
                 {
                     score += POINTS_FOR_ENEMY;
                     remove_mob_by_index(i);
@@ -256,7 +256,7 @@ void handle_mario_collisions()
                     handle_player_death();
                 }
             }
-            if (moving[i].cType == CHAR_COIN)
+            if (mobs[i].glyph == CHAR_COIN)
             {
                 score += POINTS_FOR_COIN;
                 remove_mob_by_index(i);
@@ -269,26 +269,26 @@ void handle_mario_collisions()
 
 void move_object_horizontal(TObject *obj)
 {
-    obj->x += obj->horizSpeed;
+    obj->x += obj->vx;
 
-    for (int i = 0; i < brickLength; i++)
+    for (int i = 0; i < bricks_count; i++)
     {
-        if (check_collision(*obj, brick[i]))
+        if (check_collision(*obj, bricks[i]))
         {
-            obj->x -= obj->horizSpeed;
-            obj->horizSpeed = -obj->horizSpeed;
+            obj->x -= obj->vx;
+            obj->vx = -obj->vx;
             return;
         }
     }
 
-    if (obj->cType == CHAR_ENEMY)
+    if (obj->glyph == CHAR_ENEMY)
     {
         TObject tmp = *obj;
         move_object_vertical(&tmp);
-        if (tmp.IsFly == true)
+        if (tmp.is_flying == true)
         {
-            obj->x -= obj->horizSpeed;
-            obj->horizSpeed = -obj->horizSpeed;
+            obj->x -= obj->vx;
+            obj->vx = -obj->vx;
         }
     }
 }
@@ -308,25 +308,25 @@ void place_object_on_map(const TObject obj)
     for (int i = ix; i < (ix + iWidth); i++)
         for (int j = iy; j < (iy + iHeight); j++)
             if (is_within_map(i, j))
-                map[j][i] = obj.cType;
+                screen_buffer[j][i] = obj.glyph;
 }
 
 void scroll_map_horizontal(float dx)
 {
     mario.x -= dx;
-    for (int i = 0; i < brickLength; i++)
+    for (int i = 0; i < bricks_count; i++)
     {
-        if (check_collision(mario, brick[i]))
+        if (check_collision(mario, bricks[i]))
         {
             mario.x += dx;
             return;
         }
     }
     mario.x += dx;
-    for (int i = 0; i < brickLength; i++)
-        brick[i].x += dx;
-    for (int i = 0; i < movingLength; i++)
-        moving[i].x += dx;
+    for (int i = 0; i < bricks_count; i++)
+        bricks[i].x += dx;
+    for (int i = 0; i < mobs_count; i++)
+        mobs[i].x += dx;
 }
 
 void set_cursor_pos(int x, int y)
@@ -351,8 +351,8 @@ int main()
     {
         clear_map();
 
-        if ((mario.IsFly == false) && (GetKeyState(VK_SPACE) < 0))
-            mario.vertSpeed = JUMP_IMPULSE;
+        if ((mario.is_flying == false) && (GetKeyState(VK_SPACE) < 0))
+            mario.vy = JUMP_IMPULSE;
         if (GetKeyState('A') < 0)
             scroll_map_horizontal(1);
         if (GetKeyState('D') < 0)
@@ -364,19 +364,19 @@ int main()
         move_object_vertical(&mario);
         handle_mario_collisions();
 
-        for (int i = 0; i < brickLength; i++)
-            place_object_on_map(brick[i]);
-        for (int i = 0; i < movingLength; i++)
+        for (int i = 0; i < bricks_count; i++)
+            place_object_on_map(bricks[i]);
+        for (int i = 0; i < mobs_count; i++)
         {
-            move_object_vertical(moving + i);
-            move_object_horizontal(moving + i);
-            if (moving[i].y > mapHeight)
+            move_object_vertical(mobs + i);
+            move_object_horizontal(mobs + i);
+            if (mobs[i].y > mapHeight)
             {
                 remove_mob_by_index(i);
                 i--;
                 continue;
             }
-            place_object_on_map(moving[i]);
+            place_object_on_map(mobs[i]);
         }
         place_object_on_map(mario);
         draw_score_on_map();
