@@ -1,0 +1,22 @@
+# Build artifacts
+*.exe
+*.obj
+*.o
+*.out
+*.pdb
+*.ilk
+*.map
+
+# IDE files
+*.suo
+*.user
+*.sln
+*.vcxproj
+*.vcxproj.filters
+.vs/
+.vscode/
+
+# Temporary files
+*.log
+*.tmp
+*~
